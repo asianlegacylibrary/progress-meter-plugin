@@ -2,7 +2,7 @@
 
 @import url('https://fonts.googleapis.com/css?family=Jaldi&display=swap');
 
-#progress-meter-wrapper {
+.progress-meter-wrapper {
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -16,7 +16,7 @@ p {
   user-select: none;
 }
 
-#info {
+.info {
   opacity: 0.2;
   margin: 0;
   text-align: center;
@@ -52,7 +52,7 @@ $TM-tooltipArrowHeight: 2.2; // Higher numbers produce smaller height
 @mixin border() { border: $TM-borderSize solid $TM-borderColor; }
 
 // THERMO HEADER
-#progress-meter-thermo-heading {
+.progress-meter-thermo-heading {
   font-family: "Jaldi", sans-serif;
   font-size: 1.6em;
   color: #e6fa05;
@@ -60,7 +60,7 @@ $TM-tooltipArrowHeight: 2.2; // Higher numbers produce smaller height
 
 // THERMOMETER ―――――――――――――――――――――――――
 
-#progress-meter-termometer {
+.progress-meter-termometer {
   width: $TM-width;
   background: $TM-backgroundColor;
   height: $TM-height;
@@ -99,7 +99,7 @@ $TM-tooltipArrowHeight: 2.2; // Higher numbers produce smaller height
     left: 50%;
   }
 
-  #graduations {
+  .graduations {
     height: 59%;
     top: 20%;
     width: 50%;
@@ -118,7 +118,7 @@ $TM-tooltipArrowHeight: 2.2; // Higher numbers produce smaller height
     }
   }
 
-  #progress-meter-temperature {
+  .progress-meter-temperature {
     bottom: 0;
     background: $TM-mercuryColor;
     width: 100%;

@@ -2,13 +2,16 @@
 // create plugin that connects to Google Sheets API
 // shortcode when you want to use thermometer
 // with params for the config values here
-const config = {
-    campaignName: 'Keep Wisdom Alive',
-    startingAmount: 0,
-    targetAmount: 50000,
-    currentAmount: 42090,
-    currency: "USD"
-};
+//
+// let config = {
+//     campaignName: 'Keep Wisdom Alive',
+//     targetAmount: 50000,
+//     currentAmount: 42090,
+//     startingAmount: 0,
+//     currency: "USD"
+// };
+//
+console.log('+14 config: ', config);
 
 //const range = document.querySelector("input[type='range']");
 const formattedRange = config.currentAmount.toLocaleString('en-US', {
@@ -16,8 +19,8 @@ const formattedRange = config.currentAmount.toLocaleString('en-US', {
     currency: config.currency,
 });
 
-const temperature = document.getElementById("progress-meter-temperature");
-const thermoHeader = document.getElementById("progress-meter-thermo-heading");
+const temperature = document.getElementsByClassName("progress-meter-temperature")[0];
+const thermoHeader = document.getElementsByClassName("progress-meter-thermo-heading")[0];
 thermoHeader.innerHTML += config.campaignName;
 
 function setTemperature() {
