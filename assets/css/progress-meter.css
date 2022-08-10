@@ -1,6 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Jaldi&display=swap");
-
-#progress-meter-wrapper {
+.progress-meter-wrapper {
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -14,19 +13,19 @@ p {
   user-select: none;
 }
 
-#info {
+.info {
   opacity: 0.2;
   margin: 0;
   text-align: center;
 }
 
-#progress-meter-thermo-heading {
+.progress-meter-thermo-heading {
   font-family: "Jaldi", sans-serif;
   font-size: 1.6em;
   color: #e6fa05;
 }
 
-#progress-meter-termometer {
+.progress-meter-termometer {
   width: 25px;
   background: #38383f;
   height: 240px;
@@ -36,19 +35,19 @@ p {
   z-index: 1;
   margin-bottom: 50px;
 }
-#progress-meter-termometer:before, #progress-meter-termometer:after {
+.progress-meter-termometer:before, .progress-meter-termometer:after {
   position: absolute;
   content: "";
   border-radius: 50%;
 }
-#progress-meter-termometer:before {
+.progress-meter-termometer:before {
   width: 100%;
   height: 34px;
   bottom: 9px;
   background: #38383f;
   z-index: -1;
 }
-#progress-meter-termometer:after {
+.progress-meter-termometer:after {
   transform: translateX(-50%);
   width: 50px;
   height: 50px;
@@ -58,23 +57,23 @@ p {
   z-index: -3;
   left: 50%;
 }
-#progress-meter-termometer #graduations {
+.progress-meter-termometer .graduations {
   height: 59%;
   top: 20%;
   width: 50%;
 }
-#progress-meter-termometer #graduations, #progress-meter-termometer #graduations:before {
+.progress-meter-termometer .graduations, .progress-meter-termometer .graduations:before {
   position: absolute;
   border-top: 2px solid rgba(0, 0, 0, 0.5);
   border-bottom: 2px solid rgba(0, 0, 0, 0.5);
 }
-#progress-meter-termometer #graduations:before {
+.progress-meter-termometer .graduations:before {
   content: "";
   height: 34%;
   width: 100%;
   top: 32%;
 }
-#progress-meter-termometer #progress-meter-temperature {
+.progress-meter-termometer .progress-meter-temperature {
   bottom: 0;
   background: linear-gradient(#e6fa05, #122f43) no-repeat bottom;
   width: 100%;
@@ -82,10 +81,10 @@ p {
   background-size: 100% 240px;
   transition: all 1.2s ease-in-out;
 }
-#progress-meter-termometer #progress-meter-temperature, #progress-meter-termometer #progress-meter-temperature:before, #progress-meter-termometer #progress-meter-temperature:after {
+.progress-meter-termometer .progress-meter-temperature, .progress-meter-termometer .progress-meter-temperature:before, .progress-meter-termometer .progress-meter-temperature:after {
   position: absolute;
 }
-#progress-meter-termometer #progress-meter-temperature:before {
+.progress-meter-termometer .progress-meter-temperature:before {
   content: attr(data-value);
   background: rgba(0, 0, 0, 0.7);
   color: white;
@@ -98,7 +97,7 @@ p {
   left: calc(100% + 1em / 1.5);
   top: calc(-1em + 5px - 5px * 2);
 }
-#progress-meter-termometer #progress-meter-temperature:after {
+.progress-meter-termometer .progress-meter-temperature:after {
   content: "";
   border-top: 0.4545454545em solid transparent;
   border-bottom: 0.4545454545em solid transparent;
