@@ -51,6 +51,11 @@ class Progress_Meter
      */
     private static $instance;
 
+    private function __construct()
+    {
+        error_log(__METHOD__ . ' +' . __LINE__ . PHP_EOL);
+    }
+
     /**
      * Main instance
      *
@@ -60,7 +65,7 @@ class Progress_Meter
     {
         error_log(__METHOD__ . ' +' . __LINE__ . PHP_EOL);
 
-        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Popup_Maker ) ) {
+        if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Progress_Meter ) ) {
             self::$instance = new Progress_Meter;
             self::$instance->init();
         }
@@ -72,11 +77,51 @@ class Progress_Meter
     {
         error_log(__METHOD__ . ' +' . __LINE__ . PHP_EOL);
 
-        // Delete plugin options from database
-        // $this->deleteOptions();
-
         // This adds support for a "progress-meter" shortcode
-        add_shortcode( 'progress-meter', [$this, 'progressMeterWidget'] );
+        add_shortcode('progress-meter', [$this, 'progressMeterWidget']);
+
+        // @see: https://wpmudev.com/blog/schedule-functions-in-your-plugins-with-wordpress-cron/
+        add_filter('cron_schedules', [$this, 'addCsCron']);
+        add_action('updateSchedulerNotify', [$this, 'updateSchedulerNotify']);
+    }
+
+    public function updateSchedulerNotify()
+    {
+        error_log(__METHOD__ . ' +' . __LINE__ . PHP_EOL);
+
+        $this->removePluginData();
+
+        $this->updatePluginData();
+    }
+
+    public function addCsCron()
+    {
+        error_log(__METHOD__ . ' +' . __LINE__ . PHP_EOL);
+
+        // set our 24 hours, units in seconds
+        $period = 24 * 3600;
+        // use that for 'interval' below.
+        // 'quarterday' is a unique name for our custom period
+        $array['quarterday'] = [
+            'interval' => $period,
+            'display' => 'Every 24 hours',
+        ];
+
+        return $array;
+    }
+
+    public static function runOnActivate()
+    {
+        error_log(__METHOD__ . ' +' . __LINE__ . PHP_EOL);
+
+        if (! wp_next_scheduled('updateSchedulerNotify')) {
+            wp_schedule_event( time(), 'daily', 'updateSchedulerNotify' );
+        }
+    }
+
+    public static function runOnDeactivate()
+    {
+        wp_clear_scheduled_hook('updateSchedulerNotify');
     }
 
     public function readSpreadSheetData()
@@ -140,7 +185,7 @@ class Progress_Meter
         }
     }
 
-    public function deleteOptions()
+    private function deleteOptions()
     {
         delete_option(self::PROGRESS_METER_OPTIONS);
 
@@ -168,6 +213,53 @@ class Progress_Meter
 EOH;
         echo $html;
     }
+
+    public function removePluginData()
+    {
+        error_log(__METHOD__ . ' +' . __LINE__ . PHP_EOL);
+
+        return $this->deleteOptions();
+    }
+
+    public function updatePluginData()
+    {
+        error_log(__METHOD__ . ' +' . __LINE__ . PHP_EOL);
+
+        $pluginOptions = get_option(self::PROGRESS_METER_OPTIONS, false);
+        if (($pluginOptions !== false) && is_array($pluginOptions) && !empty($pluginOptions)) {
+            error_log(__METHOD__ . ' +' . __LINE__ . ' Got saved $pluginOptions: ' . var_export($pluginOptions, true) . PHP_EOL);
+
+            return true;
+        }
+
+        // Reading data from spreadsheet.
+        $client = new \Google_Client();
+        $client->setApplicationName('ALL Dev');
+        $client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
+        $client->setAccessType('offline');
+        $client->setAuthConfig(__DIR__ . '/credentials.json');
+        $service = new Google_Service_Sheets($client);
+        $spreadsheetId = '1qyjOXkxijm5cPXSwhKt6RKDwvEfDKU1OMwqNxDiUhPw';
+        $getRange = 'A2:E2';
+        $response = $service->spreadsheets_values->get($spreadsheetId, $getRange);
+        $values = $response->getValues();
+
+        if (isset($values[0]) && is_array($values[0]) && !empty($values[0])) {
+            if ($pluginOptions === false) {
+                add_option(self::PROGRESS_METER_OPTIONS, $values[0]);
+
+                error_log(__METHOD__ . ' +' . __LINE__ . ' Added ' . self::PROGRESS_METER_OPTIONS . ' $values[0]: ' . var_export($values[0], true) . PHP_EOL);
+            } else {
+                update_option(self::PROGRESS_METER_OPTIONS, $values[0]);
+
+                error_log(__METHOD__ . ' +' . __LINE__ . ' Updated ' . self::PROGRESS_METER_OPTIONS . ' $values[0]: ' . var_export($values[0], true) . PHP_EOL);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 }
 
 /**
@@ -188,7 +280,10 @@ function pm()
 
 function pm_init()
 {
-    pm();
+    $progressMeter = pm();
+
+    register_activation_hook(__FILE__, [$progressMeter, 'runOnActivate']);
+    register_deactivation_hook(__FILE__, [$progressMeter, 'runOnDeactivate']);
 }
 
 // Get Progress Meter running
