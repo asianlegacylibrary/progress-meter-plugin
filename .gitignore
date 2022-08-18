@@ -4,3 +4,5 @@ vendor/*
 # ignore credentials.json
 credentials.json
 
+# ignore phpStorm IDE configs folder
+.idea/*
