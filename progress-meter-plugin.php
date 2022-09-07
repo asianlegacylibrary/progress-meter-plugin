@@ -31,10 +31,13 @@ require __DIR__ . '/vendor/autoload.php';
  */
 class Progress_Meter {
 
+
 	/**
 	 * @var string Plugin Options
 	 */
 	const PROGRESS_METER_OPTIONS = 'progress_meter_options';
+
+	const PROGRESS_METER_HOOK = 'progress_meter_update_scheduler';
 
 	/**
 	 * @var string Plugin Name
@@ -52,6 +55,11 @@ class Progress_Meter {
 	private static $instance;
 
 	private function __construct() {
+		error_log( __METHOD__ . ' +' . __LINE__ . PHP_EOL );
+
+		register_activation_hook( __FILE__, array( $this, 'runOnActivate' ) );
+		register_deactivation_hook( __FILE__, array( $this, 'runOnDeactivate' ) );
+
 		error_log( __METHOD__ . ' +' . __LINE__ . PHP_EOL );
 	}
 
@@ -86,7 +94,6 @@ class Progress_Meter {
 		error_log( __METHOD__ . ' +' . __LINE__ . PHP_EOL );
 
 		$this->removePluginData();
-
 		$this->updatePluginData();
 	}
 
@@ -105,16 +112,20 @@ class Progress_Meter {
 		return $array;
 	}
 
-	public static function runOnActivate() {
+	public function runOnActivate() {
 		error_log( __METHOD__ . ' +' . __LINE__ . PHP_EOL );
 
-		if ( ! wp_next_scheduled( 'updateSchedulerNotify' ) ) {
-			wp_schedule_event( time(), 'daily', 'updateSchedulerNotify' );
+		if ( ! wp_next_scheduled( self::PROGRESS_METER_HOOK ) ) {
+			$time = time();
+			wp_schedule_event( $time, 'daily', self::PROGRESS_METER_HOOK );
+			error_log( __METHOD__ . ' +' . __LINE__ . ' on $time: ' . var_export( $time, true ) . PHP_EOL );
+			error_log( __METHOD__ . ' +' . __LINE__ . ' scheduled to run hook: ' . self::PROGRESS_METER_HOOK . ' daily ' . PHP_EOL );
 		}
 	}
 
-	public static function runOnDeactivate() {
-		wp_clear_scheduled_hook( 'updateSchedulerNotify' );
+	public function runOnDeactivate() {
+		error_log( __METHOD__ . ' +' . __LINE__ . PHP_EOL );
+		wp_clear_scheduled_hook( self::PROGRESS_METER_HOOK );
 	}
 
 	public function readSpreadSheetData() {
@@ -266,9 +277,6 @@ function pm() {
 
 function pm_init() {
 	$progressMeter = pm();
-
-	register_activation_hook( __FILE__, array( $progressMeter, 'runOnActivate' ) );
-	register_deactivation_hook( __FILE__, array( $progressMeter, 'runOnDeactivate' ) );
 }
 
 // Get Progress Meter running
